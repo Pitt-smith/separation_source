@@ -3,8 +3,8 @@ close all;
 clc;
 
 %load the data
-load '../data/SignauxMelange.mat';
-load '../data/SignauxReference.mat';
+load '../../data/SignauxMelange.mat';
+load '../../data/SignauxReference.mat';
 
 fprintf('length melange : %d\n',length(Melange));
 fprintf('length reference : %d\n',length(Signal));
@@ -33,6 +33,4 @@ title('Signal 2 (Gong) : log(EQMN) = f(sizeFenetre)');
 
 figure;
 plot(Merr(1,:),Merr(4,:),'--bs');
-title('log(EQMN1) + log(EQMN2) = f(sizeFenetre)');
-
-    
+title('log(EQMN1) + log(EQMN2) = f(sizeFenetre)');    

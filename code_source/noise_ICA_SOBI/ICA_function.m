@@ -1,12 +1,11 @@
-% implementation d'ICA
+% implementation d'ICA en fonction
 % AUTEUR : Selim RABOUDI
 
-close all;
-clear all;
-clc;
+function [err] = ICA_function(Melange, Signal)
 
-load '../data/SignauxMelange.mat';
-load '../data/SignauxReference.mat';
+
+%load '../data/SignauxMelange.mat';
+%load '../data/SignauxReference.mat';
 
 
 %ETAPE 1 : blanchiment de Melange
@@ -33,30 +32,23 @@ end;
 
 sFiltre = w*x;
 
-%obtention du deuxieme signal par orthogonalisation de Gram Schmidt
+%orthogonalisation de Gram-Schmidt (en dimension 2, immediat)
 w2 = [-w(2) w(1)];
 sFiltre2 = w2*x;
 
+%sound(sFiltre,8000)
 sOiseau = Signal(1,:);
 sGong = Signal(2,:);
 
-errOiseau = 10*log10(1 - (sFiltre*sOiseau'/(norm(sFiltre)*norm(sOiseau)))^2);
-errGong = 10*log10(1 - (sFiltre*sGong'/(norm(sFiltre)*norm(sGong)))^2);
+errOiseau1 = 10*log10(1 - (sFiltre*sOiseau'/(norm(sFiltre)*norm(sOiseau)))^2);
+errGong1 = 10*log10(1 - (sFiltre*sGong'/(norm(sFiltre)*norm(sGong)))^2);
 errOiseau2 = 10*log10(1 - (sFiltre2*sOiseau'/(norm(sFiltre2)*norm(sOiseau)))^2);
 errGong2 = 10*log10(1 - (sFiltre2*sGong'/(norm(sFiltre2)*norm(sGong)))^2);
+err = [min(errOiseau1, errGong1) min(errOiseau2, errGong2)];
+%sprintf('erreur signal oiseau : %.1f',errOiseau);
+%sprintf('erreur signal gong : %.1f',errGong);
 
-err = [min(errOiseau, errGong) min(errOiseau2, errGong2)]
-
-
-%ecoute des sons   
-sound(sFiltre,8000);
-pause(3);
+sound(sFiltre, 8000);
+pause(3)
 sound(sFiltre2,8000);
-
-
-
-
-
-
-
 

@@ -1,24 +1,12 @@
+%fonction implementant l'algorithme de SOBI
 %Auteur : Selim RABOUDI
-%dans cette version, j'utilise un algo de fenetre glissante pour creer plus
-%de vecteurs enfants des signaux melangés, et ainsi mieux estimer la
-%matrice d'intercovariance
 
-clear all;
-close all;
-clc;
-
-%load les donnees
-load '../../data/SignauxMelange.mat';
-load '../../data/SignauxReference.mat';
+function [errVect] = SOBI_functionv2(SizeChild, Melange, Signal, varNoise)
 
 N = length(Melange);
 
 x1 = Melange(1,:)';
 x2 = Melange(2,:)';
-
-R11 = x1*x1';
-R22 = x2*x2';
-R12 = x1*x2';
 
 %je divise chaque xi en plusieurs vecteurs, de taille moindre, pour trois
 %raisons :
@@ -33,7 +21,7 @@ R12 = x1*x2';
 
 
 %taille des vecteurs enfants ( = Taille de la fenetre glissante)
-SizeChild = 40;
+%SizeChild = 100;
 
 %nombre de vecteurs enfants
 nbX = N - SizeChild + 1;
@@ -50,20 +38,20 @@ end
 
 %matrice contenant les matrices d'intercovariance pour chaque vecteur
 %enfant de x1
-Xinter11 = zeros(SizeChild,SizeChild);
-Xinter22 = zeros(SizeChild,SizeChild);
-Xinter12 = zeros(SizeChild,SizeChild);
+R11 = zeros(SizeChild,SizeChild);
+R22 = zeros(SizeChild,SizeChild);
+R12 = zeros(SizeChild,SizeChild);
 
 for k=1:nbX
-    Xinter11 = Xinter11 + X1(:,k)*X1(:,k)';
-    Xinter22 = Xinter22 + X2(:,k)*X2(:,k)';
-    Xinter12 = Xinter12 + X1(:,k)*X2(:,k)';
+    R11 = R11 + X1(:,k)*X1(:,k)';
+    R22 = R22 + X2(:,k)*X2(:,k)';
+    R12 = R12 + X1(:,k)*X2(:,k)';
 end;
 
 %l'esperance est approximee par la moyenne lineaire
-R11 = 1/(nbX)*Xinter11;
-R22 = 1/(nbX)*Xinter22;
-R12 = 1/(nbX)*Xinter12;
+R11 = 1/(nbX)*R11;
+R22 = 1/(nbX)*R22;
+R12 = 1/(nbX)*R12;
 
 %calcul des valeurs F et T
 T1 = trace(R11);
@@ -75,16 +63,16 @@ F2 = 1/(SizeChild*(SizeChild-1))*(sum(sum(R22)) - T2);
 F12 = 1/(SizeChild*(SizeChild-1))*(sum(sum(R12)) - T12);
 
 %calcul des autres constantes
-alpha = 2*F12*T12 - (F1*T2 + F2*T1);
-beta = 2*((T12)^2 - T1*T2);
-gamma2 = (F1*T2 - F2*T1)^2 + 4*(F12*T2-T12*F2)*(F12*T1 - T12*F1);
+alpha = 2*F12*T12 - (F1*(T2-varNoise) + F2*(T1-varNoise));
+beta = 2*((T12)^2 - (T1-varNoise)*(T2-varNoise));
+gamma2 = (F1*(T2-varNoise) - F2*(T1-varNoise))^2 + 4*(F12*(T2-varNoise)-T12*F2)*(F12*(T1-varNoise) - T12*F1);
 gamma = sqrt(gamma2);
 d1 = alpha - gamma;
 d2 = alpha + gamma;
 
 %finalement Achap
 
-Achap = [beta*F1-T1*d1 , beta*F12-T12*d2 ; beta*F12-T12*d1 , beta*F2-T2*d2];
+Achap = [beta*F1-(T1-varNoise)*d1 , beta*F12-T12*d2 ; beta*F12-T12*d1 , beta*F2-(T2-varNoise)*d2];
 
 invAChap = inv(Achap);
 
@@ -100,12 +88,9 @@ sGong = Signal(2,:);
 
 errOiseau = 10*log10(1 - (s1Estime*sOiseau'/(norm(s1Estime)*norm(sOiseau)))^2);
 errGong = 10*log10(1 - (s2Estime*sGong'/(norm(s2Estime)*norm(sGong)))^2);
-sprintf('erreur signal oiseau : %.1f',errOiseau);
-sprintf('erreur signal gong : %.1f',errGong);
-errOiseau
-errGong
+%sprintf('erreur signal oiseau : %.1f',errOiseau)
+%sprintf('erreur signal gong : %.1f',errGong)
+errVect = [SizeChild ; errOiseau ; errGong ; errOiseau + errGong];
 
-sound(s1Estime, 8000);
-pause(3);
-sound(s2Estime, 8000);
+
 
