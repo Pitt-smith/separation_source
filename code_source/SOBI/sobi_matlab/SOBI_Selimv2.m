@@ -7,6 +7,7 @@ clear all;
 close all;
 clc;
 
+tic;
 %load les donnees
 load '../../data/SignauxMelange.mat';
 load '../../data/SignauxReference.mat';
@@ -33,7 +34,7 @@ R12 = x1*x2';
 
 
 %taille des vecteurs enfants ( = Taille de la fenetre glissante)
-SizeChild = 40;
+SizeChild = 40
 
 %nombre de vecteurs enfants
 nbX = N - SizeChild + 1;
@@ -93,6 +94,8 @@ Sestime = invAChap*Melange;
 s1Estime = Sestime(1,:);
 s2Estime = Sestime(2,:);
 
+toc;
+
 %calcul d'erreur :
 sOiseau = Signal(1,:);
 sGong = Signal(2,:);
@@ -104,7 +107,7 @@ sprintf('erreur signal oiseau : %.1f',errOiseau);
 sprintf('erreur signal gong : %.1f',errGong);
 errOiseau
 errGong
-
+errOiseau + errGong 
 sound(s1Estime, 8000);
 pause(3);
 sound(s2Estime, 8000);

@@ -2,7 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <math.h>
-
+#include <time.h>
 
 main(int argc, char** argv)
 {
@@ -24,6 +24,11 @@ main(int argc, char** argv)
 	const int nbX = tailleSignal - sizeChild + 1;
 	printf("nbX : %d\n", nbX);
 	**/
+
+	//calcul du temps d'execution du programme
+	clock_t start_t, end_t;
+	double total_t;
+	start_t = clock();
 /// debut de chargement des donnees
         printf("\n*** importation des fichiers signaux ***\n");
 	
@@ -59,6 +64,7 @@ main(int argc, char** argv)
 	const int tailleSignal = NbEchr1; 
 	//taille des vecteurs enfants = CHOIX de la taille de fenetre
 	const int sizeChild = 40;
+	printf("\ntaille de la fenetre glissante : %d\n\n", sizeChild);
 	//nombre de vecteurs enfants
 	const int nbX = tailleSignal - sizeChild + 1;
 	
@@ -201,6 +207,15 @@ main(int argc, char** argv)
 		s2Estime[k] = invA[1][0]*Melange1[k] + invA[1][1]*Melange2[k];
 	}
 
+
+	//calcul du temps d'execution du programme
+	end_t = clock();
+	total_t = (double)(end_t - start_t) / CLOCKS_PER_SEC;
+	printf("temps d'execution du programme : %f\n", total_t);
+	
+
+
+
 	//calcul des produits scalaires et normes
 	double prod1, prod2, nEstime1, nEstime2, nSignal1, nSignal2;
 
@@ -225,7 +240,8 @@ main(int argc, char** argv)
 
 	printf("\n*** CALCUL DES ERREURS ***\n");
 	printf("erreur sur le signal 1 = %.2lf dB\n", err1);
-	printf("erreur sur le signal 2 = %.2lf dB\n\n", err2);
+	printf("erreur sur le signal 2 = %.2lf dB\n", err2);
+	printf("erreur sur le signal 1+2 = %.2lf dB\n\n", err1+err2);
 
 
 	//enregistrement des signaux estimes sur fichier texte, facilement exportables

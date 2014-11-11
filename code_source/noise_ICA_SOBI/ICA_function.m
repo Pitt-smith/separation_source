@@ -48,7 +48,7 @@ err = [min(errOiseau1, errGong1) min(errOiseau2, errGong2)];
 %sprintf('erreur signal oiseau : %.1f',errOiseau);
 %sprintf('erreur signal gong : %.1f',errGong);
 
-sound(sFiltre, 8000);
-pause(3)
-sound(sFiltre2,8000);
+% sound(sFiltre, 8000);
+% pause(3)
+% sound(sFiltre2,8000);
 
